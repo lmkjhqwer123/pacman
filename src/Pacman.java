@@ -2,6 +2,7 @@
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
+import javax.swing.JApplet;
 import java.awt.*;
 import java.util.*;
 import java.lang.*;
@@ -29,8 +30,7 @@ public class Pacman extends JApplet implements MouseListener, KeyListener
 
     /* Create and set up window frame*/
     JFrame f=new JFrame(); 
-    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    f.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+    f.setSize(420,460);
 
     /* Add the board to the frame */
     f.add(b,BorderLayout.CENTER);

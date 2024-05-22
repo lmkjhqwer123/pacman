@@ -156,7 +156,7 @@ public class Board extends JPanel
       }
     }
 
-    /* Handle the weird spots with no pellets*/
+    //tạo ra 1 khu vực trống chứa các đồng xu để pacman ăn
     for(int i = 5;i<14;i++)
     {
       for(int j = 5;j<12;j++)

@@ -1,4 +1,3 @@
-/* Drew Schuster */
 import java.awt.*;
 import javax.imageio.*;
 import javax.swing.JPanel;
@@ -6,30 +5,10 @@ import java.lang.Math;
 import java.util.*;
 import java.io.*;
 
-/*This board class contains the player, ghosts, pellets, and most of the game logic.*/
+// Class này chứa các thông tin về trạng thái của trò chơi, điều khiển các sự kiện trong trò chơi
 public class Board extends JPanel
 {
-  /* Initialize the images*/
-  /* For JAR File*/
-  /*
-  Image pacmanImage = Toolkit.getDefaultToolkit().getImage(Pacman.class.getResource("img/pacman.jpg"));
-  Image pacmanUpImage = Toolkit.getDefaultToolkit().getImage(Pacman.class.getResource("img/pacmanup.jpg")); 
-  Image pacmanDownImage = Toolkit.getDefaultToolkit().getImage(Pacman.class.getResource("img/pacmandown.jpg")); 
-  Image pacmanLeftImage = Toolkit.getDefaultToolkit().getImage(Pacman.class.getResource("img/pacmanleft.jpg")); 
-  Image pacmanRightImage = Toolkit.getDefaultToolkit().getImage(Pacman.class.getResource("img/pacmanright.jpg")); 
-  Image ghost10 = Toolkit.getDefaultToolkit().getImage(Pacman.class.getResource("img/ghost10.jpg")); 
-  Image ghost20 = Toolkit.getDefaultToolkit().getImage(Pacman.class.getResource("img/ghost20.jpg")); 
-  Image ghost30 = Toolkit.getDefaultToolkit().getImage(Pacman.class.getResource("img/ghost30.jpg")); 
-  Image ghost40 = Toolkit.getDefaultToolkit().getImage(Pacman.class.getResource("img/ghost40.jpg")); 
-  Image ghost11 = Toolkit.getDefaultToolkit().getImage(Pacman.class.getResource("img/ghost11.jpg")); 
-  Image ghost21 = Toolkit.getDefaultToolkit().getImage(Pacman.class.getResource("img/ghost21.jpg")); 
-  Image ghost31 = Toolkit.getDefaultToolkit().getImage(Pacman.class.getResource("img/ghost31.jpg")); 
-  Image ghost41 = Toolkit.getDefaultToolkit().getImage(Pacman.class.getResource("img/ghost41.jpg")); 
-  Image titleScreenImage = Toolkit.getDefaultToolkit().getImage(Pacman.class.getResource("img/titleScreen.jpg")); 
-  Image gameOverImage = Toolkit.getDefaultToolkit().getImage(Pacman.class.getResource("img/gameOver.jpg")); 
-  Image winScreenImage = Toolkit.getDefaultToolkit().getImage(Pacman.class.getResource("img/winScreen.jpg"));
-  */
-  /* For NOT JAR file*/
+ //setting hình ảnh cho trò chơi 
   Image pacmanImage = Toolkit.getDefaultToolkit().getImage("src/img/pacman.jpg"); 
   Image pacmanUpImage = Toolkit.getDefaultToolkit().getImage("src/img/pacmanup.jpg"); 
   Image pacmanDownImage = Toolkit.getDefaultToolkit().getImage("src/img/pacmandown.jpg"); 
@@ -47,40 +26,39 @@ public class Board extends JPanel
   Image gameOverImage = Toolkit.getDefaultToolkit().getImage("src/img/gameOver.jpg"); 
   Image winScreenImage = Toolkit.getDefaultToolkit().getImage("src/img/winScreen.jpg");
 
-  /* Initialize the player and ghosts */
+ //cập nhật vị trí cho ng chơi và ghost khi bắt đầu game
   Player player = new Player(200,300);
   Ghost ghost1 = new Ghost(180,180);
   Ghost ghost2 = new Ghost(200,180);
   Ghost ghost3 = new Ghost(220,180);
   Ghost ghost4 = new Ghost(220,180);
 
-  /* Timer is used for playing sound effects and animations */
+  // khởi tạo biến timer(thòi gian) để kiểm soát sự phát hiên các event trong quá trình chơi
   long timer = System.currentTimeMillis();
 
-  /* Dying is used to count frames in the dying animation.  If it's non-zero,
-     pacman is in the process of dying */
+  //đếm số khung hình chết của pacman ,Nếu nó khác không, Pacman đang trong quá trình chết.
   int dying=0;
  
-  /* Score information */
+  //điểm số hiện tại và điểm số cao nhất
   int currScore;
   int highScore;
 
-  /* if the high scores have been cleared, we have to update the top of the screen to reflect that */
+  // kiểm tra xem điểm số cao nhất đã được xóa hay chưa
   boolean clearHighScores= false;
 
-  int numLives=2;
+  int numLives=2;//mạng sống của pacman
 
-  /*Contains the game map, passed to player and ghosts */
-  boolean[][] state;
+  
+  boolean[][] state;//map
 
-  /* Contains the state of all pellets*/
-  boolean[][] pellets;
+  
+  boolean[][] pellets;//lưu trữ các viên gạch
 
-  /* Game dimensions */
+  
   int gridSize;
   int max;
 
-  /* State flags*/
+  //khởi tạo các trạng thái để kiểm soát các sự kiện trong trò chơi
   boolean stopped;
   boolean titleScreen;
   boolean winScreen = false;
@@ -88,16 +66,17 @@ public class Board extends JPanel
   boolean demo = false;
   int New;
 
-  /* Used to call sound effects */
+ //khởi tạo âm thanh
   GameSounds sounds;
 
+  //lưu trũ viên kẹo cuối cùng ăn
   int lastPelletEatenX = 0;
   int lastPelletEatenY=0;
 
-  /* This is the font used for the menus */
+  //font chữ 
   Font font = new Font("Monospaced",Font.BOLD, 12);
 
-  /* Constructor initializes state flags etc.*/
+  //khởi tạo bảng
   public Board() 
   {
     initHighScores();
@@ -110,7 +89,7 @@ public class Board extends JPanel
     titleScreen = true;
   }
 
-  /* Reads the high scores file and saves it */
+  //đọc file và tải điểm số cao nhất
   public void initHighScores()
   {
     File file = new File("highScores.txt");
@@ -126,7 +105,7 @@ public class Board extends JPanel
     }
   }
 
-  /* Writes the new high score to a file and sets flag to update it on screen */
+  // đọc file và update điem số cao nhất
   public void updateScore(int score)
   {
     PrintWriter out;
@@ -139,12 +118,12 @@ public class Board extends JPanel
     catch(Exception e)
     {
     }
-    highScore=score;
+    highScore=score;//cập nhật điểm số cao nhất
     clearHighScores=true;
   }
 
-  /* Wipes the high scores file and sets flag to update it on screen */
-  public void clearHighScores()
+ //xóa điểm số cao nhất và lưu nó về 0
+   public void clearHighScores()
   {
     PrintWriter out;
     try
@@ -160,14 +139,14 @@ public class Board extends JPanel
     clearHighScores=true;
   }
 
-  /* Reset occurs on a new game*/
+  //khởi tạo lại trạng thái ban đầu của trò chơi
   public void reset()
   {
     numLives=2;
     state = new boolean[20][20];
     pellets = new boolean[20][20];
 
-    /* Clear state and pellets arrays */
+    //đặt tất cả trạng thái ban đầu của viên gạch và map về true
     for(int i=0;i<20;i++)
     {
       for(int j=0;j<20;j++)

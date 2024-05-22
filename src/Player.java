@@ -2,33 +2,33 @@ import java.util.HashSet;
 import java.util.Set;
 public class Player extends Mover
 {
-  /* Direction is used in demoMode, currDirection and desiredDirection are used in non demoMode*/ 
-  char direction;
-  char currDirection;
-  char desiredDirection;
+  
+  char direction;//hướng di chuyển của người chơi
+  char currDirection;//hướng người chơi đang di chuyển hiện tại
+  char desiredDirection;//hướng người chơi muốn di chuyển
 
-  /* Keeps track of pellets eaten to determine end of game */
-  int pelletsEaten;
+  
+  int pelletsEaten;// số lượng viên gạch đã ăn
 
-  /* Last location */
+  //vị trí cuối cùng của ng chơi trên map
   int lastX;
   int lastY;
  
-  /* Current location */
+  //vị trí người chơi hiện tại 
   int x;
   int y;
  
-  /* Which pellet the pacman is on top of */
+  // vị trí của viên gạch mà pacman đang đứg trên 
   int pelletX;
   int pelletY;
 
-  /* teleport is true when travelling through the teleport tunnels*/
+  // di chuyển xuyên map
   boolean teleport;
   
-  /* Stopped is set when the pacman is not moving or has been killed */
+  //  dừng lại khi gặp phải chướng ngại vật hoặc die 
   boolean stopped = false;
 
-  /* Constructor places pacman in initial location and orientation */
+  //khởi tạo vị trí pacman
   public Player(int x, int y)
   {
 
@@ -56,19 +56,20 @@ public class Player extends Mover
   }
 
 
-  /* This function is used for demoMode.  It is copied from the Ghost class.  See that for comments */
+  //xác định hướng di chuyển cho người chơi
   public char newDirection()
   { 
      int random;
      char backwards='U';
      int newX=x,newY=y;
      int lookX=x,lookY=y;
-     Set<Character> set = new HashSet<Character>();
-    switch(direction)
+     Set<Character> set = new HashSet<Character>();//lưu trữ các hướng đã thử 
+    switch(direction)//xác định hướng ngược lại với hướng hiện tại
     {
       case 'L':
          backwards='R';
          break;     
+
       case 'R':
          backwards='L';
          break;     
@@ -81,6 +82,7 @@ public class Player extends Mover
     }
      char newDirection = backwards;
      while (newDirection == backwards || !isValidDest(lookX,lookY))
+     //Vòng lặp này sẽ tiếp tục cho đến khi tìm được một hướng mới không phải là hướng ngược lại và là một điểm đến hợp lệ.
      {
        if (set.size()==3)
        {
@@ -91,7 +93,7 @@ public class Player extends Mover
        newY=y;
        lookX=x;
        lookY=y;
-       random = (int)(Math.random()*4) + 1;
+       random = (int)(Math.random()*4) + 1;//tạo một ramdoom từ 1 đến 4 để chọn hướng đi
        if (random == 1)
        {
          newDirection = 'L';
@@ -118,13 +120,13 @@ public class Player extends Mover
        }
        if (newDirection != backwards)
        {
-         set.add(new Character(newDirection));
+         set.add(new Character(newDirection));//thêm hướng mới vào set
        }
      } 
      return newDirection;
   }
 
-  /* This function is used for demoMode.  It is copied from the Ghost class.  See that for comments */
+  //kiểm tra xem người chơi có đang ở vị trí có thể chọn hướng hay ko
   public boolean isChoiceDest()
   {
     if (  x%gridSize==0&& y%gridSize==0 )
@@ -134,11 +136,13 @@ public class Player extends Mover
     return false;
   }
 
-  /* This function is used for demoMode.  It is copied from the Ghost class.  See that for comments */
+  // test di chuyển trc
   public void demoMove()
   {
+    //lưu vị trí hiện tại
     lastX=x;
     lastY=y;
+    //kiểm tra xe người chơi có thể chuyển hướng hay ko
     if (isChoiceDest())
     {
       direction = newDirection();
@@ -176,21 +180,19 @@ public class Player extends Mover
            y+= increment;
          break;     
     }
-    currDirection = direction;
-    frameCount ++;
+    currDirection = direction;//cập nhật hướng di chuyển hiện tại
+    frameCount ++; //tăng số frame để kiểm soát animation
   }
 
-  /* The move function moves the pacman for one frame in non demo mode */
+  //di chuyển pacman
   public void move()
   {
     int gridSize=20;
     lastX=x;
     lastY=y;
      
-    /* Try to turn in the direction input by the user */
-    /*Can only turn if we're in center of a grid*/
+    //thay đổi hướng di chuyển
     if (x %20==0 && y%20==0 ||
-       /* Or if we're reversing*/
        (desiredDirection=='L' && currDirection=='R')  ||
        (desiredDirection=='R' && currDirection=='L')  ||
        (desiredDirection=='U' && currDirection=='D')  ||
@@ -217,7 +219,8 @@ public class Player extends Mover
            break;     
       }
     }
-    /* If we haven't moved, then move in the direction the pacman was headed anyway */
+    // nếu ko đổi hướng thì sẽ vẫn di chuyển theo hướng hiện tại
+    else
     if (lastX==x && lastY==y)
     {
       switch(currDirection)
@@ -251,17 +254,17 @@ public class Player extends Mover
       }
     }
 
-    /* If we did change direction, update currDirection to reflect that */
+    //nếu đổi hướng thì currDirection sẽ dc cập nhật
     else
     {
       currDirection=desiredDirection;
     }
    
-    /* If we didn't move at all, set the stopped flag */    
+    //nếu ko di chuyển thì stopped=true 
     if (lastX == x && lastY==y)
       stopped=true;
   
-    /* Otherwise, clear the stopped flag and increment the frameCount for animation purposes*/
+    //nếu di chuyển stopped=false và framecount tăng lên
     else
     {
       stopped=false;
@@ -269,7 +272,7 @@ public class Player extends Mover
     }
   }
 
-  /* Update what pellet the pacman is on top of */
+  //cập nhật vị trí viên gạch mà pacman đang cố ăn
   public void updatePellet()
   {
     if (x%gridSize ==0 && y%gridSize == 0)

@@ -1,9 +1,5 @@
-import java.awt.*;
-import javax.imageio.*;
-import javax.swing.JPanel;
-import java.lang.Math;
-import java.util.*;
-import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
 public class Player extends Mover
 {
   /* Direction is used in demoMode, currDirection and desiredDirection are used in non demoMode*/ 
